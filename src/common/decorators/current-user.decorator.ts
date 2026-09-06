@@ -1,8 +1,6 @@
 import { createParamDecorator, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 
-// 5. Custom Decorators (createParamDecorator, not SetMetadata)
-// Simulated: normally comes from req.user via a JWT guard. For now, reads
-// a test header the same way RolesGuard reads 'user-role'.
+// مفهوم الCustom Decorators
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): number => {
     const request = ctx.switchToHttp().getRequest();
