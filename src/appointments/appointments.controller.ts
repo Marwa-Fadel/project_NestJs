@@ -4,29 +4,32 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
-// تطبيق لمفهوم ال Controllers
+// مفهوم ال Controllers
 @Controller('appointments')
-@UseInterceptors(TransformInterceptor) // تطبيق لمفهوم ال Interceptors
+@UseInterceptors(TransformInterceptor) // مفهوم ال Interceptors
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  @Roles('PATIENT') // تطبيق لمفهوم ال Custom Decorators
-  @UseGuards(RolesGuard) //تطبيق لمفهوم ال Guards
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
+  @Roles('PATIENT') // مفهوم ال Custom Decorators (ضفنا ميتا داتا)
+  @UseGuards(RolesGuard) // مفهوم ال Guards
+  create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @CurrentUser() patientId: number, //مفهوم ال Custom Decorators
+  ) {
     const { doctorId, startTime, endTime } = createAppointmentDto;
-    const patientId = 1; 
     return this.appointmentsService.create(
       doctorId,
-      patientId, 
+      patientId,
       new Date(startTime),
-      new Date(endTime)
+      new Date(endTime),
     );
   }
-  
+
   @Get()
-  @Roles('ADMIN') 
+  @Roles('ADMIN')
   @UseGuards(RolesGuard)
   findAll() {
      return this.appointmentsService.findAll();
