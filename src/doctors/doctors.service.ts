@@ -6,7 +6,6 @@ export interface Doctor {
   specialty: string;
 }
 
-// Simulated data (in-memory), same style as the rest of the project
 @Injectable()
 export class DoctorsService {
   private readonly doctors: Doctor[] = [

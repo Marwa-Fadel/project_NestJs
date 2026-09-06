@@ -1,8 +1,8 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
-// 9. Exception Filters
-@Catch() // catch everything, differentiate below
+// مفهوم ال Exception Filters
+@Catch() 
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -12,8 +12,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
-      // exception.message is always the generic label (e.g. "Bad Request Exception").
-      // getResponse() has the real detail, including the Pipe's validation messages.
       const message =
         typeof exceptionResponse === 'string'
           ? exceptionResponse
@@ -27,7 +25,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    // Not an HttpException (unexpected bug) - keep the same envelope shape
     console.error(exception);
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,

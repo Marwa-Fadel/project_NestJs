@@ -1,4 +1,4 @@
 import { SetMetadata } from '@nestjs/common';
 
-// 5. Custom Decorators
+//  مفهوم الCustom Decorators
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);

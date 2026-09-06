@@ -1,6 +1,6 @@
 import { IsDateString, IsInt, IsNotEmpty } from 'class-validator';
 
-// 7. Pipes (validation)
+// Pipes
 export class CreateAppointmentDto {
   @IsInt()
   @IsNotEmpty()

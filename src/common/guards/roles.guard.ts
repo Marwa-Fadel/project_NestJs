@@ -10,7 +10,6 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) return true;
     
     const request = context.switchToHttp().getRequest();
-    // In a real app, this comes from JWT. Here we use headers for testing.
     const userRole = request.headers['user-role']; 
 
     if (!userRole) return false;
