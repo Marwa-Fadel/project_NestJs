@@ -1,24 +1,16 @@
 import { Injectable } from '@nestjs/common';
-
-export interface Doctor {
-  id: number;
-  name: string;
-  specialty: string;
-}
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class DoctorsService {
-  private readonly doctors: Doctor[] = [
-    { id: 1, name: 'Dr. Layla Haddad', specialty: 'Cardiology' },
-    { id: 2, name: 'Dr. Omar Nasser', specialty: 'Dermatology' },
-    { id: 3, name: 'Dr. Sara Khalil', specialty: 'Pediatrics' },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
-  exists(doctorId: number): boolean {
-    return this.doctors.some((doctor) => doctor.id === doctorId);
+  async exists(doctorId: number): Promise<boolean> {
+    const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } });
+    return doctor !== null;
   }
 
-  findAll(): Doctor[] {
-    return this.doctors;
+  findAll() {
+    return this.prisma.doctor.findMany();
   }
 }

@@ -1,0 +1,26 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Doctor {
+  id           Int           @id @default(autoincrement())
+  name         String
+  specialty    String
+  appointments Appointment[]
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  doctorId  Int
+  patientId Int
+  startTime DateTime
+  endTime   DateTime
+  status    String   @default("BOOKED")
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+}

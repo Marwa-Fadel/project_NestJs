@@ -6,9 +6,11 @@ export class CreateAppointmentDto {
   @IsNotEmpty()
   doctorId: number;
 
-  @IsDateString()
+  // strict: true rejects calendar-impossible dates like 2026-02-30
+  // (loose ISO8601 checking only validates the format, not real days-per-month)
+  @IsDateString({ strict: true })
   startTime: string;
 
-  @IsDateString()
+  @IsDateString({ strict: true })
   endTime: string;
 }
