@@ -8,9 +8,9 @@ export class RolesGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
     if (!requiredRoles) return true;
-    
+
     const request = context.switchToHttp().getRequest();
-    const userRole = request.headers['user-role']; 
+    const userRole = request.user?.role; // set by JwtStrategy after a valid token
 
     if (!userRole) return false;
     return requiredRoles.includes(userRole);

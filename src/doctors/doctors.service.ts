@@ -10,7 +10,13 @@ export class DoctorsService {
     return doctor !== null;
   }
 
-  findAll() {
-    return this.prisma.doctor.findMany();
+  findAll(specialty?: string) {
+    return this.prisma.doctor.findMany({
+      where: specialty ? { specialty } : undefined,
+    });
+  }
+
+  create(data: { name: string; specialty: string }) {
+    return this.prisma.doctor.create({ data });
   }
 }
