@@ -24,17 +24,12 @@ async function main() {
   // There's no API route to create an ADMIN (register always creates a
   // PATIENT, on purpose - letting anyone self-register as ADMIN would be a
   // security hole). So the only way to ever get an admin account is to seed
-  // one directly here.
-  const existingAdmin = await prisma.patient.findUnique({ where: { email: 'admin@test.com' } });
+  // one directly here. ADMIN is a User with no linked Patient profile.
+  const existingAdmin = await prisma.user.findUnique({ where: { email: 'admin@test.com' } });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
-    await prisma.patient.create({
-      data: {
-        name: 'Admin',
-        email: 'admin@test.com',
-        password: hashedPassword,
-        role: 'ADMIN',
-      },
+    await prisma.user.create({
+      data: { email: 'admin@test.com', password: hashedPassword, role: 'ADMIN' },
     });
     console.log('Seeded 1 admin account (admin@test.com / admin123).');
   } else {

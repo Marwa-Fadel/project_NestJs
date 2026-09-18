@@ -41,6 +41,7 @@ export class AppointmentsService {
       const conflict = await tx.appointment.findFirst({
         where: {
           doctorId,
+          status: { not: 'CANCELLED' }, // موعد ملغى ما لازم يمنع حجز نفس الوقت
           startTime: { lt: endTime },
           endTime: { gt: startTime },
         },
@@ -62,7 +63,7 @@ export class AppointmentsService {
     });
   }
 
-  async findOne(id: number, requestingUserId?: number, requestingRole?: string) {
+  async findOne(id: number, requestingPatientId?: number, requestingRole?: string) {
     const appointment = await this.prisma.appointment.findUnique({ where: { id } });
     if (!appointment) {
       throw new NotFoundException(`Appointment with id ${id} was not found.`);
@@ -71,7 +72,7 @@ export class AppointmentsService {
     if (
       requestingRole &&
       requestingRole !== 'ADMIN' &&
-      appointment.patientId !== requestingUserId
+      appointment.patientId !== requestingPatientId
     ) {
       throw new ForbiddenException('You can only view your own appointments.');
     }
@@ -79,8 +80,8 @@ export class AppointmentsService {
     return appointment;
   }
 
-  async cancel(id: number, requestingUserId: number, requestingRole: string) {
-    const appointment = await this.findOne(id, requestingUserId, requestingRole);
+  async cancel(id: number, requestingPatientId: number, requestingRole: string) {
+    const appointment = await this.findOne(id, requestingPatientId, requestingRole);
 
     if (appointment.status === 'CANCELLED') {
       throw new BadRequestException('This appointment is already cancelled.');

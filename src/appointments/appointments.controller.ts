@@ -16,7 +16,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentPatientId } from '../common/decorators/current-patient-id.decorator';
 import { CurrentUserRole } from '../common/decorators/current-user-role.decorator';
 
 // مفهوم ال Controllers
@@ -30,7 +30,7 @@ export class AppointmentsController {
   @Roles('PATIENT') // مفهوم ال Custom Decorators (ضفنا ميتا داتا)
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
-    @CurrentUser() patientId: number, //مفهوم ال Custom Decorators
+    @CurrentPatientId() patientId: number, //مفهوم ال Custom Decorators
   ) {
     const { doctorId, startTime, endTime } = createAppointmentDto;
     return this.appointmentsService.create(
@@ -43,13 +43,13 @@ export class AppointmentsController {
 
   @Get()
   @Roles('ADMIN')
-  findAll(@Query('patientId') patientId?: string) {
-    return this.appointmentsService.findAll(patientId ? Number(patientId) : undefined);
+  findAll(@Query('patientId', new ParseIntPipe({ optional: true })) patientId?: number) {
+    return this.appointmentsService.findAll(patientId);
   }
 
   @Get('mine')
   @Roles('PATIENT')
-  findMine(@CurrentUser() patientId: number) {
+  findMine(@CurrentPatientId() patientId: number) {
     return this.appointmentsService.findAll(patientId);
   }
 
@@ -57,19 +57,19 @@ export class AppointmentsController {
   @Roles('ADMIN', 'PATIENT')
   findOne(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() userId: number,
+    @CurrentPatientId() patientId: number | undefined,
     @CurrentUserRole() role: string,
   ) {
-    return this.appointmentsService.findOne(id, userId, role);
+    return this.appointmentsService.findOne(id, patientId, role);
   }
 
   @Patch(':id/cancel')
   @Roles('PATIENT', 'ADMIN')
   cancel(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() userId: number,
+    @CurrentPatientId() patientId: number | undefined,
     @CurrentUserRole() role: string,
   ) {
-    return this.appointmentsService.cancel(id, userId, role);
+    return this.appointmentsService.cancel(id, patientId as number, role);
   }
 }

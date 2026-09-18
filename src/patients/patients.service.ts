@@ -5,15 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PatientsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByEmail(email: string) {
-    return this.prisma.patient.findUnique({ where: { email } });
+  findByUserId(userId: number) {
+    return this.prisma.patient.findUnique({ where: { userId } });
   }
 
   findById(id: number) {
     return this.prisma.patient.findUnique({ where: { id } });
   }
 
-  create(data: { name: string; email: string; password: string }) {
+  create(data: { name: string; userId: number }) {
     return this.prisma.patient.create({ data });
   }
 }

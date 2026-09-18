@@ -2,7 +2,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Prisma 7 generates the client to disk now (no longer hidden inside node_modules)
 src/generated/
 
+# SQLite database file - generated locally by prisma migrate/seed, not committed
 prisma/dev.db
 prisma/dev.db-journal
