@@ -5,6 +5,11 @@ dist/
 # Prisma 7 generates the client to disk now (no longer hidden inside node_modules)
 src/generated/
 
-# SQLite database file - generated locally by prisma migrate/seed, not committed
-prisma/dev.db
-prisma/dev.db-journal
+# SQLite database file - DATABASE_URL="file:./dev.db" resolves relative to
+# the project root (wherever the CLI/app is run from), not prisma/, so the
+# actual file lands at the repo root - not inside prisma/.
+dev.db
+dev.db-journal
+
+# secrets - never commit .env, only the template
+.env

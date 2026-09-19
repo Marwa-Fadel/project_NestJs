@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { PatientsService } from '../patients/patients.service';
 import { RegisterDto } from './dto/register.dto';
@@ -9,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly prisma: PrismaService,
     private readonly usersService: UsersService,
     private readonly patientsService: PatientsService,
     private readonly jwtService: JwtService,
@@ -27,8 +29,19 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     try {
-      const user = await this.usersService.create({ email, password: hashedPassword });
-      const patient = await this.patientsService.create({ name: dto.name, userId: user.id });
+      // ملفوفة بـ transaction: إنشاء الـ User والـ Patient لازم يصيروا وحدة
+      // واحدة، وإلا لو فشلت الخطوة الثانية بيضل عندنا User بدون ملف مريض
+      // وما بيقدر يحجز أبداً.
+      const { user, patient } = await this.prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: { email, password: hashedPassword },
+        });
+        const patient = await tx.patient.create({
+          data: { name: dto.name, userId: user.id },
+        });
+        return { user, patient };
+      });
+
       return this.signToken(user.id, user.role, patient.id);
     } catch (e: any) {
       // race condition backstop: two registrations for the same email at
